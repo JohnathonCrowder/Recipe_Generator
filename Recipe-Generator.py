@@ -206,12 +206,17 @@ textbox.delete('0.0', "end")
 textbox.configure(state="disabled")
 textbox.grid(row=1, column =0)
 
+#updates image
+def get_image(image_name):
+    Image_path = r"archive\Food Images\\" + image_name + ".jpg"
+    your_image.configure(light_image=Image.open(os.path.join(Image_path)))
 
 #Updates the text box
 def update_text(food_object):
     textbox.configure(state="normal")
     textbox.delete('0.0', "end")
     textbox.insert('0.0', str(food_object.title) + '\n\n' + str(food_object.ingredients) + '\n\n' + food_object.instructions)
+    get_image(str(food_object.image_name))
     textbox.configure(state="disabled")
 
 
@@ -323,6 +328,10 @@ optionmenu.grid(row = 3, column = 1)
 
 
 
+#Initializes the Image
+your_image = ctk.CTkImage(light_image=Image.open(os.path.join(r"archive\first_image.jpg")), size=(300 , 300))
+label1 = ctk.CTkLabel(master=window, image=your_image, text='')
+label1.grid(column=1, row=1)
 
 
 

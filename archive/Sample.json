@@ -22,5 +22,23 @@
         "ingredients": "['1 cup chopped fresh strawberries, stemmed & washed', '1/2 cup lemon juice', '1/4 cup agave or honey', '2 cups water', 'Ice for serving']",
         "instructions": "Pure\u00e9 strawberries and honey in a blender or food processor until smooth and transfer to a pitcher. Pour the strawberry mixture, water and lemon juice in a pitcher and stir to combine. Chill and serve over ice.",
         "image_name": "strawberry-lemonade-51262830"
+    },
+    "Escarole with Italian Sausage and White Beans": {
+        "title": "Escarole with Italian Sausage and White Beans",
+        "ingredients": "['3 tablespoons olive oil', '12 Italian sausages (about 3 pounds), casings removed', '1 cup chopped onion', '1/2 cup chopped prosciutto (about 2 ounces)', '1 tablespoon minced garlic', '1/2 teaspoon dried crushed red pepper', '1 large head escarole, chopped (about 10 cups)', '3/4 cup dry white wine', '4 (15-ounce) cans Great Northern beans, rinsed, drained', '1 cup chicken stock or canned low-salt chicken broth', 'Freshly grated Parmesan cheese (optional)']",
+        "instructions": "Heat oil in heavy large pot over medium-high heat. Working in batches, saut\u00e9 sausage until cooked through, breaking up with back of spoon, about 6 minutes per batch. Using slotted spoon, transfer sausage to bowl, leaving drippings in pot. Reduce heat to medium; add onion to pot and saut\u00e9 until translucent, about 5 minutes. Add prosciutto and saut\u00e9 1 minute. Mix in garlic and crushed red pepper. Add escarole and saut\u00e9 until wilted, about 2 minutes. Add wine and cook 2 minutes. Add beans, stock and sausage and simmer 10 minutes to blend flavors. Season to taste with salt and pepper. Transfer to large bowl. Top with grated Parmesan, if desired.",
+        "image_name": "escarole-with-italian-sausage-and-white-beans-15600"
+    },
+    "Bloody Mary": {
+        "title": "Bloody Mary",
+        "ingredients": "['1/4 cup (2 ounces) tomato juice', '3 tablespoons (1 1/2 ounces) vodka', '1 teaspoon Worcestershire sauce', '3/4 teaspoon freshly grated horseradish', '3 dashes hot pepper sauce, such as Tabasco', '1 pinch salt', '1 dash freshly ground black pepper', 'About 1 cup ice cubes', '1/4 teaspoon fresh lemon juice', '1 stalk celery', '1 lemon wedge (optional)']",
+        "instructions": "In 11-ounce highball glass, stir together tomato juice, vodka, Worcestershire sauce, horseradish, hot sauce, salt, and pepper. Fill glass with ice, then pour mixture into second glass. Pour back and forth 3 to 4 times to mix well, then sprinkle lemon juice over. Garnish with celery stalk and lemon wedge (if using) and serve.",
+        "image_name": "bloody-mary-351589"
+    },
+    "Bittersweet Chocolate and Walnut Fudge": {
+        "title": "Bittersweet Chocolate and Walnut Fudge",
+        "ingredients": "['1 pound bittersweet (not unsweetened) or semisweet chocolate, chopped', '3/4 cup (1 1/2 sticks) unsalted butter, room temperature', '2 ounces unsweetened chocolate, chopped', '2 teaspoons instant espresso powder', '3 cups sugar', '1 12-ounce can fat-free evaporated milk', '1 1/2 cups walnut pieces, toasted', '1 tablespoon vanilla extract']",
+        "instructions": "Line 13x9x2-inch metal baking pan with foil, leaving overhang. Combine first 4 ingredients in large bowl. Stir sugar and evaporated milk in heavy large deep saucepan over medium heat until sugar dissolves and mixture comes to boil. Attach clip-on candy thermometer to side of pan. Boil until temperature registers 234\u00b0F, stirring constantly and adjusting heat to avoid boiling over, about 10 minutes. Immediately pour milk mixture over chocolate mixture. Whisk until chocolate and butter melt and fudge is smooth. Mix in nuts and vanilla. Spread fudge evenly in prepared pan. Refrigerate uncovered until cold and set, about 3 hours. Using foil as aid, lift fudge from pan. Cut crosswise into 7 strips, then lengthwise into 5 strips. Return to pan, cover, and chill. (Can be made 2 weeks ahead. Keep covered and chilled. Bring to room temperature before serving.)",
+        "image_name": "bittersweet-chocolate-and-walnut-fudge-231749"
     }
 }

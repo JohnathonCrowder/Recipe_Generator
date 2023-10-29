@@ -68,14 +68,9 @@ class Pantry:
     def write_recipe_dict_to_json(self):
         """Writes the recipe dictionary to a JSON file"""
         filepath = r"archive\Sample.json"  # path to the JSON file
-        with open(filepath, 'r') as f:  # open the file in read mode
-            temp_dict = json.load(f)  # load the existing JSON data into a temp dictionary
-
-        # Append new values to the temporary dictionary
-        temp_dict.update(self.to_dict())  # update the temp dictionary with the new values from the recipe
 
         with open(filepath, 'w') as f:  # open the file in write mode
-            json.dump(temp_dict, f, indent=4)  # write the updated temp dictionary to the file, with indentation
+            json.dump(self.to_dict(), f, indent=4)  # write the updated temp dictionary to the file, with indentation
 
 
     def load_saved_recipes(self):
@@ -245,11 +240,33 @@ def previous_recipe():
         pantry.previous_recipe_placeholder = 2
 
 
-
-
-
 button1 = ctk.CTkButton(window, text="Previous Recipe", command=previous_recipe)
 button1.grid(row=2, column =0)
+
+
+
+#This button saves the current recipe and updates the dropdown menu
+def save_current_recipe():
+    if pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title not in [item.title for item in pantry.recipes]:
+
+        pantry.add_recipe(pantry.previous_recipe[1])
+        print(f"recipe added: {pantry.previous_recipe[1].title}")
+        pantry.write_recipe_dict_to_json()
+
+    elif pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title in [item.title for item in pantry.recipes]:
+        print("You already have this recipe saved")
+
+    else:
+        pantry.add_recipe(pantry.previous_recipe[pantry.previous_recipe_placeholder - 1])
+        print(f"Recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
+        pantry.write_recipe_dict_to_json()
+
+
+    optionmenu.configure(values=[food.title for food in pantry.recipes])
+
+button2 = ctk.CTkButton(window, text="Save Recipe", command=save_current_recipe)
+button2.grid(row=2, column =1)
+
 
 
 #sets recipe to selected saved recipe

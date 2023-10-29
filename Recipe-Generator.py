@@ -265,7 +265,6 @@ def save_current_recipe():
     else:
         pantry.add_recipe(pantry.previous_recipe[pantry.previous_recipe_placeholder - 1])
         print(f"Recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
-        print([item.title for item in pantry.recipes])
         pantry.write_recipe_dict_to_json()
 
 
@@ -273,6 +272,30 @@ def save_current_recipe():
 
 button2 = ctk.CTkButton(window, text="Save Recipe", command=save_current_recipe)
 button2.grid(row=2, column =1)
+
+
+
+
+
+#Deletes the selected recipe.
+def delete_recipe_from_json():
+
+    current_recipe = pantry.previous_recipe[pantry.previous_recipe_placeholder-1].title
+
+
+    if current_recipe in [recipe.title for recipe in pantry.recipes]:
+        pantry.remove_recipe(current_recipe)
+        optionmenu.configure(values=[food.title for food in pantry.recipes])
+        pantry.write_recipe_dict_to_json()
+        print(f"Recipe removed: {current_recipe}")
+    else:
+        print(f"Recipe has not been saved: {current_recipe}")
+
+
+
+
+button5 = ctk.CTkButton(window, text="remove recipe", command=delete_recipe_from_json)
+button5.grid(row=4, column =1)
 
 
 

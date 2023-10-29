@@ -29,6 +29,7 @@ class Pantry:
         self.recipes = []
         self.previous_recipe = {i: "" for i in range(1, 11)}
         self.load_saved_recipes()
+        self.previous_recipe_placeholder = 1
 
     def add_recipe(self, recipe):
         """Add a new recipe to the collection"""
@@ -111,18 +112,12 @@ class Pantry:
 
 
 
-    def assign_previous_recipe(self, input_value):
+    def add_previous_recipe(self, input_value):
         """
-        Assigns the input value to the first available slot in the previous_recipe dictionary,
-        starting from the highest key (10) and descending to the lowest key (1).
-        If all slots are occupied, increments all key values by 1 in the opposite direction.
+        Increments all key values in pevious_recipe_dictionary by one.
+        Then assigns the input value to the first slot in the previous_recipe dictionary,
         """
-        for key in reversed(range(1, 11)):  # start from 10 and descend to 1
-            if self.previous_recipe[key] == "":  # check if the slot is empty
-                self.previous_recipe[key] = input_value  # assign the input value
-                return
 
-        # if all slots are occupied, increment all key values by 1 in the opposite direction
         for key in reversed(range(1, 11)):
             temp_dict = self.previous_recipe.copy()
             if key > 1:
@@ -130,6 +125,8 @@ class Pantry:
             self.previous_recipe = temp_dict
 
         self.previous_recipe[1] = input_value  # assign the input value to the "wrapped around" slot
+
+        return
 
 
     def __len__(self):
@@ -227,9 +224,32 @@ def update_text(food_object):
 def new_recipe_button():
     temp = cookbook.get_random_recipe()
     update_text(temp)
+    pantry.add_previous_recipe(temp)
+    pantry.previous_recipe_placeholder = 2
 
 button = ctk.CTkButton(window, text="New Recipe", command=new_recipe_button)
 button.grid(row=0, column =0)
+
+
+
+#This is the button to return to the previous Recipe
+def previous_recipe():
+
+    #Image_path = r"archive\Food Images\Food Images\\" + previous_food.image_name + ".jpg"
+    #get_image()
+    if pantry.previous_recipe_placeholder < 11 and pantry.previous_recipe[pantry.previous_recipe_placeholder] != '':
+        update_text(pantry.previous_recipe[pantry.previous_recipe_placeholder])
+        pantry.previous_recipe_placeholder += 1
+    else:
+        update_text(pantry.previous_recipe[1])
+        pantry.previous_recipe_placeholder = 2
+
+
+
+
+
+button1 = ctk.CTkButton(window, text="Previous Recipe", command=previous_recipe)
+button1.grid(row=2, column =0)
 
 
 #sets recipe to selected saved recipe
@@ -239,6 +259,8 @@ def optionmenu_callback(choice):
             delete_me = recipe
             update_text(recipe)
             Image_path = r"archive\Food Images\Food Images\\" + recipe.image_name + ".jpg"
+            pantry.add_previous_recipe(recipe)
+            pantry.previous_recipe_placeholder = 2
             #get_image()
 
 

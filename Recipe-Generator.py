@@ -247,18 +247,25 @@ button1.grid(row=2, column =0)
 
 #This button saves the current recipe and updates the dropdown menu
 def save_current_recipe():
-    if pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title not in [item.title for item in pantry.recipes]:
+
+    pantry_recipe_titles = [item.title for item in pantry.recipes]
+
+    if pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title not in pantry_recipe_titles:
 
         pantry.add_recipe(pantry.previous_recipe[1])
-        print(f"recipe added: {pantry.previous_recipe[1].title}")
+        print(f"Recipe saved: {pantry.previous_recipe[1].title}")
         pantry.write_recipe_dict_to_json()
 
-    elif pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title in [item.title for item in pantry.recipes]:
-        print("You already have this recipe saved")
+    elif pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title in pantry_recipe_titles:
+        print(f"You already have this recipe saved: {pantry.previous_recipe[1].title}")
+
+    elif pantry.previous_recipe_placeholder != 2 and pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title in pantry_recipe_titles:
+        print(f"You already have this recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
 
     else:
         pantry.add_recipe(pantry.previous_recipe[pantry.previous_recipe_placeholder - 1])
         print(f"Recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
+        print([item.title for item in pantry.recipes])
         pantry.write_recipe_dict_to_json()
 
 
@@ -266,6 +273,9 @@ def save_current_recipe():
 
 button2 = ctk.CTkButton(window, text="Save Recipe", command=save_current_recipe)
 button2.grid(row=2, column =1)
+
+
+
 
 
 

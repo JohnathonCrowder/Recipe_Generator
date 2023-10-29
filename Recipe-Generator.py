@@ -193,151 +193,145 @@ from customtkinter import filedialog
 from PIL import Image
 import tkinter
 
+class recipeGUI:
+    def __init__(self, master):
+        #Create Window
 
-#Create Window
-window = ctk.CTk()
-window.title('Recipe Generator')
-window.geometry('1200x450')
-
-
-#Creates Text box for the recipe
-textbox = ctk.CTkTextbox(window, width=800, height= 300)
-textbox.delete('0.0', "end")
-textbox.configure(state="disabled")
-textbox.grid(row=1, column =0)
-
-#updates image
-def get_image(image_name):
-    Image_path = r"archive\Food Images\\" + image_name + ".jpg"
-    your_image.configure(light_image=Image.open(os.path.join(Image_path)))
-
-#Updates the text box
-def update_text(food_object):
-    textbox.configure(state="normal")
-    textbox.delete('0.0', "end")
-    textbox.insert('0.0', str(food_object.title) + '\n\n' + str(food_object.ingredients) + '\n\n' + food_object.instructions)
-    get_image(str(food_object.image_name))
-    textbox.configure(state="disabled")
+        window.title('Recipe Generator')
+        window.geometry('1200x450')
+        self.init_ui()
 
 
-#this is the button that generates a new recipe
-def new_recipe_button():
-    temp = cookbook.get_random_recipe()
-    update_text(temp)
-    pantry.add_previous_recipe(temp)
-    pantry.previous_recipe_placeholder = 2
+    def init_ui(self):
 
-button = ctk.CTkButton(window, text="New Recipe", command=new_recipe_button)
-button.grid(row=0, column =0)
+        #Creates Text box for the recipe
+        self.textbox = ctk.CTkTextbox(window, width=800, height= 300)
+        self.textbox.delete('0.0', "end")
+        self.textbox.configure(state="disabled")
+        self.textbox.grid(row=1, column =0)
+
+        #New recipe button
+        self.button = ctk.CTkButton(window, text="New Recipe", command=self.new_recipe_button)
+        self.button.grid(row=0, column =0)
+
+        #Previous recipe button
+        self.button1 = ctk.CTkButton(window, text="Previous Recipe", command=self.previous_recipe)
+        self.button1.grid(row=2, column =0)
+
+        #Save button
+        self.button2 = ctk.CTkButton(window, text="Save Recipe", command=self.save_current_recipe)
+        self.button2.grid(row=2, column =1)
+
+        #Remove recipe button
+        self.button5 = ctk.CTkButton(window, text="remove recipe", command=self.delete_recipe_from_json)
+        self.button5.grid(row=4, column =1)
+
+        #creates the dropdown menu object
+        self.optionmenu = ctk.CTkOptionMenu(window, values=[food.title for food in pantry.recipes],command=self.optionmenu_callback)
+        self.optionmenu.set("Saved Recipes")
+        self.optionmenu.grid(row = 3, column = 1)
 
 
 
-#This is the button to return to the previous Recipe
-def previous_recipe():
+        #Initializes the Image
+        self.your_image = ctk.CTkImage(light_image=Image.open(os.path.join(r"archive\first_image.jpg")), size=(300 , 300))
+        self.label1 = ctk.CTkLabel(master=window, image=self.your_image, text='')
+        self.label1.grid(column=1, row=1)
 
-    #Image_path = r"archive\Food Images\Food Images\\" + previous_food.image_name + ".jpg"
-    #get_image()
-    if pantry.previous_recipe_placeholder < 11 and pantry.previous_recipe[pantry.previous_recipe_placeholder] != '':
-        update_text(pantry.previous_recipe[pantry.previous_recipe_placeholder])
-        pantry.previous_recipe_placeholder += 1
-    else:
-        update_text(pantry.previous_recipe[1])
+
+    #updates image
+    def get_image(self,image_name):
+        Image_path = r"archive\Food Images\\" + image_name + ".jpg"
+        self.your_image.configure(light_image=Image.open(os.path.join(Image_path)))
+
+    #Updates the text box
+    def update_text(self,food_object):
+        self.textbox.configure(state="normal")
+        self.textbox.delete('0.0', "end")
+        self.textbox.insert('0.0', str(food_object.title) + '\n\n' + str(food_object.ingredients) + '\n\n' + food_object.instructions)
+        self.get_image(str(food_object.image_name))
+        self.textbox.configure(state="disabled")
+
+
+    #this is the button that generates a new recipe
+    def new_recipe_button(self):
+        temp = cookbook.get_random_recipe()
+        self.update_text(temp)
+        pantry.add_previous_recipe(temp)
         pantry.previous_recipe_placeholder = 2
 
 
-button1 = ctk.CTkButton(window, text="Previous Recipe", command=previous_recipe)
-button1.grid(row=2, column =0)
+    #This is the button to return to the previous Recipe
+    def previous_recipe(self):
 
-
-
-#This button saves the current recipe and updates the dropdown menu
-def save_current_recipe():
-
-    pantry_recipe_titles = [item.title for item in pantry.recipes]
-
-    if pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title not in pantry_recipe_titles:
-
-        pantry.add_recipe(pantry.previous_recipe[1])
-        print(f"Recipe saved: {pantry.previous_recipe[1].title}")
-        pantry.write_recipe_dict_to_json()
-
-    elif pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title in pantry_recipe_titles:
-        print(f"You already have this recipe saved: {pantry.previous_recipe[1].title}")
-
-    elif pantry.previous_recipe_placeholder != 2 and pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title in pantry_recipe_titles:
-        print(f"You already have this recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
-
-    else:
-        pantry.add_recipe(pantry.previous_recipe[pantry.previous_recipe_placeholder - 1])
-        print(f"Recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
-        pantry.write_recipe_dict_to_json()
-
-
-    optionmenu.configure(values=[food.title for food in pantry.recipes])
-
-button2 = ctk.CTkButton(window, text="Save Recipe", command=save_current_recipe)
-button2.grid(row=2, column =1)
-
-
-
-
-
-#Deletes the selected recipe.
-def delete_recipe_from_json():
-
-    current_recipe = pantry.previous_recipe[pantry.previous_recipe_placeholder-1].title
-
-
-    if current_recipe in [recipe.title for recipe in pantry.recipes]:
-        pantry.remove_recipe(current_recipe)
-        optionmenu.configure(values=[food.title for food in pantry.recipes])
-        pantry.write_recipe_dict_to_json()
-        print(f"Recipe removed: {current_recipe}")
-    else:
-        print(f"Recipe has not been saved: {current_recipe}")
-
-
-
-
-button5 = ctk.CTkButton(window, text="remove recipe", command=delete_recipe_from_json)
-button5.grid(row=4, column =1)
-
-
-
-
-
-
-#sets recipe to selected saved recipe
-def optionmenu_callback(choice):
-    for recipe in pantry.recipes:
-        if recipe.title == choice:
-            delete_me = recipe
-            update_text(recipe)
-            Image_path = r"archive\Food Images\Food Images\\" + recipe.image_name + ".jpg"
-            pantry.add_previous_recipe(recipe)
+        #Image_path = r"archive\Food Images\Food Images\\" + previous_food.image_name + ".jpg"
+        #get_image()
+        if pantry.previous_recipe_placeholder < 11 and pantry.previous_recipe[pantry.previous_recipe_placeholder] != '':
+            self.update_text(pantry.previous_recipe[pantry.previous_recipe_placeholder])
+            pantry.previous_recipe_placeholder += 1
+        else:
+            self.update_text(pantry.previous_recipe[1])
             pantry.previous_recipe_placeholder = 2
-            #get_image()
+
+
+
+    #This button saves the current recipe and updates the dropdown menu
+    def save_current_recipe(self):
+
+        pantry_recipe_titles = [item.title for item in pantry.recipes]
+
+        if pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title not in pantry_recipe_titles:
+
+            pantry.add_recipe(pantry.previous_recipe[1])
+            print(f"Recipe saved: {pantry.previous_recipe[1].title}")
+            pantry.write_recipe_dict_to_json()
+
+        elif pantry.previous_recipe_placeholder == 2 and pantry.previous_recipe[1].title in pantry_recipe_titles:
+            print(f"You already have this recipe saved: {pantry.previous_recipe[1].title}")
+
+        elif pantry.previous_recipe_placeholder != 2 and pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title in pantry_recipe_titles:
+            print(f"You already have this recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
+
+        else:
+            pantry.add_recipe(pantry.previous_recipe[pantry.previous_recipe_placeholder - 1])
+            print(f"Recipe saved: {pantry.previous_recipe[pantry.previous_recipe_placeholder - 1].title}")
+            pantry.write_recipe_dict_to_json()
+
+
+        self.optionmenu.configure(values=[food.title for food in pantry.recipes])
 
 
 
 
-#creates the dropdown menu object
-optionmenu = ctk.CTkOptionMenu(window, values=[food.title for food in pantry.recipes],command=optionmenu_callback)
-optionmenu.set("Saved Recipes")
-optionmenu.grid(row = 3, column = 1)
+    #Deletes the selected recipe.
+    def delete_recipe_from_json(self):
+
+        current_recipe = pantry.previous_recipe[pantry.previous_recipe_placeholder-1].title
+
+
+        if current_recipe in [recipe.title for recipe in pantry.recipes]:
+            pantry.remove_recipe(current_recipe)
+            self.optionmenu.configure(values=[food.title for food in pantry.recipes])
+            pantry.write_recipe_dict_to_json()
+            print(f"Recipe removed: {current_recipe}")
+        else:
+            print(f"Recipe has not been saved: {current_recipe}")
 
 
 
-#Initializes the Image
-your_image = ctk.CTkImage(light_image=Image.open(os.path.join(r"archive\first_image.jpg")), size=(300 , 300))
-label1 = ctk.CTkLabel(master=window, image=your_image, text='')
-label1.grid(column=1, row=1)
+    #sets recipe to selected saved recipe
+    def optionmenu_callback(self,choice):
+        for recipe in pantry.recipes:
+            if recipe.title == choice:
+                delete_me = recipe
+                self.update_text(recipe)
+                Image_path = r"archive\Food Images\Food Images\\" + recipe.image_name + ".jpg"
+                pantry.add_previous_recipe(recipe)
+                pantry.previous_recipe_placeholder = 2
+                #get_image()
 
 
-
-
-
-
-
+window = ctk.CTk()
+gui = recipeGUI(window)
 #run
 window.mainloop()

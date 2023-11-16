@@ -244,12 +244,11 @@ class recipeGUI:
 
         # Combobox creation
         n = ctk.StringVar()
-        self.menulist = ctk.CTkComboBox(window, width = 750, variable = "n")
-
-        # Adding combobox drop down list
-        self.menulist.configure(values=["Search Recipes Here"])
+        self.menulist = ctk.CTkComboBox(window, width = 750, variable = "n",values=["Search Recipes Here"],command=self.combobox_callback)
 
         self.menulist.grid(column = 0, row = 0)
+
+
 
 
 
@@ -356,9 +355,10 @@ class recipeGUI:
                 pantry.previous_recipe_placeholder = 2
                 #get_image()
 
-    def searchs_recipe(self):
-        #search_term = self.search_entry.get()
-        if search_term:
+    def combobox_callback(self,search_term):
+        # Updates the text box based on the search item clicked
+        search_term = self.menulist.get()
+        if search_term != None and search_term != "Search Recipes Here":
             recipe = cookbook.fetch_specific_recipe(search_term)
             print(recipe)
             if recipe is not None:
@@ -366,7 +366,7 @@ class recipeGUI:
             else:
                 messagebox.showinfo("No recipe found", f"No recipe found with title '{search_term}'")
         else:
-            messagebox.showinfo("Error", "Please enter a search term")
+            pass
 
 
 
@@ -374,16 +374,18 @@ class recipeGUI:
     def search_recipe(self):
         #Gets the search parameter and searches for the recipe.
         search_term = self.menulist.get()
-        results = self.cookbook.search_recipes(search_term)
+        results = cookbook.search_recipes(search_term)
 
         #Set Menu entrys to search results
-        self.menulist['values'] = results
-        self.menulist.current()
-
+        self.menulist.configure(values=results)
 
         # If no results, display message
         if not results:
-            messagebox.showinfo("No results", "No recipes found matching your search term.")
+            if search_term:
+                messagebox.showinfo("No recipe found", f"No recipe found with title '{search_term}'")
+            else:
+                messagebox.showinfo("Error", "Please enter a search term")
+
 
 
 window = ctk.CTk()

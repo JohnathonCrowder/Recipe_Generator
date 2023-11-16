@@ -166,15 +166,14 @@ class Cookbook:
         match = self.dataframe['Title'].str.match(pattern, na=False)  # find an exact match in the Title column
         if match.any():  # if there's at least one match
             row = self.dataframe[match].iloc[0]  # return the first match
-            # Create a temporary dictionary with the desired keys and values
-            temp_dict = {
-                'title': row['Title'],
-                'ingredients': row['Ingredients'],
-                'instructions': row['Instructions'],
-                'image_name': row['Image_Name']
-            }
-            print(temp_dict)  # print the dictionary to console
-            return row
+
+            row = row.replace('\n', ' ', regex=True)  # replace newlines with spaces
+            title = row['Title']  # extract the title
+            ingredients = row['Ingredients'] # extract the ingredients
+            instructions = row['Instructions']  # extract the instructions
+            image_name = row['Image_Name'] # extract the image name
+            recipe = Recipe(title, ingredients, instructions, image_name)  # create a Recipe object
+            return recipe
         else:  # if no match is found
             return None
 
@@ -192,9 +191,14 @@ import customtkinter as ctk
 from customtkinter import filedialog
 from PIL import Image
 import tkinter
+from tkinter import messagebox
+import re
+
+
+
 
 class recipeGUI:
-    def __init__(self, master):
+    def __init__(self, window):
         #Create Window
 
         window.title('Recipe Generator')
@@ -212,7 +216,7 @@ class recipeGUI:
 
         #New recipe button
         self.button = ctk.CTkButton(window, text="New Recipe", command=self.new_recipe_button)
-        self.button.grid(row=0, column =0)
+        self.button.grid(row=3, column =0)
 
         #Previous recipe button
         self.button1 = ctk.CTkButton(window, text="Previous Recipe", command=self.previous_recipe)
@@ -231,6 +235,28 @@ class recipeGUI:
         self.optionmenu.set("Saved Recipes")
         self.optionmenu.grid(row = 3, column = 1)
 
+
+        # Search field
+        #self.search_entry = ctk.CTkEntry(window, width=400)
+        #self.search_entry.grid(row = 0, column = 0)
+
+
+
+        # Combobox creation
+        n = ctk.StringVar()
+        self.menulist = ctk.CTkComboBox(window, width = 750, variable = "n")
+
+        # Adding combobox drop down list
+        self.menulist.configure(values=["Search Recipes Here"])
+
+        self.menulist.grid(column = 0, row = 0)
+
+
+
+
+        # Search button
+        self.search_button = ctk.CTkButton(window, text="Search", command=self.search_recipe)
+        self.search_button.grid(row = 0, column = 1)
 
 
         #Initializes the Image
@@ -329,6 +355,35 @@ class recipeGUI:
                 pantry.add_previous_recipe(recipe)
                 pantry.previous_recipe_placeholder = 2
                 #get_image()
+
+    def searchs_recipe(self):
+        #search_term = self.search_entry.get()
+        if search_term:
+            recipe = cookbook.fetch_specific_recipe(search_term)
+            print(recipe)
+            if recipe is not None:
+                self.update_text(recipe)
+            else:
+                messagebox.showinfo("No recipe found", f"No recipe found with title '{search_term}'")
+        else:
+            messagebox.showinfo("Error", "Please enter a search term")
+
+
+
+
+    def search_recipe(self):
+        #Gets the search parameter and searches for the recipe.
+        search_term = self.menulist.get()
+        results = self.cookbook.search_recipes(search_term)
+
+        #Set Menu entrys to search results
+        self.menulist['values'] = results
+        self.menulist.current()
+
+
+        # If no results, display message
+        if not results:
+            messagebox.showinfo("No results", "No recipes found matching your search term.")
 
 
 window = ctk.CTk()

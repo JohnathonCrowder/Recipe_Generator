@@ -193,6 +193,8 @@ from PIL import Image
 import tkinter
 from tkinter import messagebox
 import re
+from CTkListbox import *
+
 
 
 
@@ -202,66 +204,93 @@ class recipeGUI:
         #Create Window
 
         window.title('Recipe Generator')
-        window.geometry('1200x450')
+        window.geometry('1700x1080+50')
+        #Create a fullscreen window
         self.init_ui()
 
 
     def init_ui(self):
 
-        #Creates Text box for the recipe
-        self.textbox = ctk.CTkTextbox(window, width=800, height= 300)
+        ############Adding ListBox for ingredients###################
+
+        # Create a new Listbox widget
+        self.listbox = CTkListbox(window, width=780, height= 50)
+
+        # Add the Listbox to the window
+        self.listbox.grid(row=2, column=0)
+
+        ############Title#############
+        self.label1 = ctk.CTkLabel(window, text="Recipe Generator:", font=('Times New Roman',30))
+        self.label1.grid(row=1, column=0)
+
+        ########### Buttons ###########
+        self.segemented_button = ctk.CTkSegmentedButton(window,border_width=20,corner_radius=10,unselected_hover_color="gray", values=["Previous Recipe","New Recipe", "Save Recipe", "Remove Recipe"],command=self.segmented_button_callback)
+        #self.segemented_button.set("Value 1")
+        self.segemented_button.grid(row=4, column=0)
+
+        ####### Creates Text box for the recipe #########
+        self.textbox = ctk.CTkTextbox(window, width=800, height= 280)
         self.textbox.delete('0.0', "end")
+        self.textbox.insert('0.0', "Welcome to the Recipe Generator!")
         self.textbox.configure(state="disabled")
-        self.textbox.grid(row=1, column =0)
+        self.textbox.grid(row=3, column=0)
 
-        #New recipe button
-        self.button = ctk.CTkButton(window, text="New Recipe", command=self.new_recipe_button)
-        self.button.grid(row=3, column =0)
 
-        #Previous recipe button
-        self.button1 = ctk.CTkButton(window, text="Previous Recipe", command=self.previous_recipe)
-        self.button1.grid(row=2, column =0)
-
-        #Save button
-        self.button2 = ctk.CTkButton(window, text="Save Recipe", command=self.save_current_recipe)
-        self.button2.grid(row=2, column =1)
-
-        #Remove recipe button
-        self.button5 = ctk.CTkButton(window, text="remove recipe", command=self.delete_recipe_from_json)
-        self.button5.grid(row=4, column =1)
-
-        #creates the dropdown menu object
+        ######## creates the dropdown menu object ###########
         self.optionmenu = ctk.CTkOptionMenu(window, values=[food.title for food in pantry.recipes],command=self.optionmenu_callback)
         self.optionmenu.set("Saved Recipes")
-        self.optionmenu.grid(row = 3, column = 1)
+        self.optionmenu.grid(row = 4, column = 1)
 
 
-        # Search field
+        ######## Search field ##########
         #self.search_entry = ctk.CTkEntry(window, width=400)
         #self.search_entry.grid(row = 0, column = 0)
 
 
 
-        # Combobox creation
+        ######## Combobox creation ########
         n = ctk.StringVar()
         self.menulist = ctk.CTkComboBox(window, width = 750, variable = "n",values=["Search Recipes Here"],command=self.combobox_callback)
 
         self.menulist.grid(column = 0, row = 0)
 
 
-
-
-
-
-        # Search button
+        ######## Search button #######
         self.search_button = ctk.CTkButton(window, text="Search", command=self.search_recipe)
         self.search_button.grid(row = 0, column = 1)
 
 
-        #Initializes the Image
-        self.your_image = ctk.CTkImage(light_image=Image.open(os.path.join(r"archive\first_image.jpg")), size=(300 , 300))
-        self.label1 = ctk.CTkLabel(master=window, image=self.your_image, text='')
-        self.label1.grid(column=1, row=1)
+        ######## Initializes the Image #########
+        self.your_image = ctk.CTkImage(light_image=Image.open(os.path.join(r"archive\first_image.jpg")), size=(500 , 500))
+        self.label = ctk.CTkLabel(master=window, image=self.your_image, text='')
+        self.label.grid(column=1, row=2, rowspan=2)
+
+
+
+
+
+
+    #####Multi-Button Callback ########
+    def segmented_button_callback(self,value):
+
+        if value == "New Recipe":
+            self.new_recipe_button()
+            self.segemented_button.set("Value 1")
+
+        elif value == "Previous Recipe":
+            self.previous_recipe()
+            self.segemented_button.set("Value 1")
+
+        elif value == "Save Recipe":
+            self.save_current_recipe()
+            self.segemented_button.set("Value 1")
+
+        elif value == "Remove Recipe":
+            self.delete_recipe_from_json()
+            self.segemented_button.set("Value 1")
+
+
+
 
 
     #updates image
@@ -273,9 +302,13 @@ class recipeGUI:
     def update_text(self,food_object):
         self.textbox.configure(state="normal")
         self.textbox.delete('0.0', "end")
-        self.textbox.insert('0.0', str(food_object.title) + '\n\n' + str(food_object.ingredients) + '\n\n' + food_object.instructions)
+        if isinstance(food_object, str):  # Check if food_object is a string
+            return  # If it's a string, don't try to access ingredients
+        self.textbox.insert('0.0', "Instructions:" + '\n\n' + food_object.instructions)
+        self.update_listbox(food_object.ingredients)
         self.get_image(str(food_object.image_name))
         self.textbox.configure(state="disabled")
+        self.label1.configure(text=str(food_object.title))
 
 
     #this is the button that generates a new recipe
@@ -289,8 +322,7 @@ class recipeGUI:
     #This is the button to return to the previous Recipe
     def previous_recipe(self):
 
-        #Image_path = r"archive\Food Images\Food Images\\" + previous_food.image_name + ".jpg"
-        #get_image()
+
         if pantry.previous_recipe_placeholder < 11 and pantry.previous_recipe[pantry.previous_recipe_placeholder] != '':
             self.update_text(pantry.previous_recipe[pantry.previous_recipe_placeholder])
             pantry.previous_recipe_placeholder += 1
@@ -350,10 +382,9 @@ class recipeGUI:
             if recipe.title == choice:
                 delete_me = recipe
                 self.update_text(recipe)
-                Image_path = r"archive\Food Images\Food Images\\" + recipe.image_name + ".jpg"
                 pantry.add_previous_recipe(recipe)
                 pantry.previous_recipe_placeholder = 2
-                #get_image()
+
 
     def combobox_callback(self,search_term):
         # Updates the text box based on the search item clicked
@@ -363,6 +394,8 @@ class recipeGUI:
             print(recipe)
             if recipe is not None:
                 self.update_text(recipe)
+                pantry.add_previous_recipe(recipe)
+                pantry.previous_recipe_placeholder = 2
             else:
                 messagebox.showinfo("No recipe found", f"No recipe found with title '{search_term}'")
         else:
@@ -385,6 +418,16 @@ class recipeGUI:
                 messagebox.showinfo("No recipe found", f"No recipe found with title '{search_term}'")
             else:
                 messagebox.showinfo("Error", "Please enter a search term")
+
+    def update_listbox(self, recipe):
+        if self.listbox.size() > 0:
+            self.listbox.delete(0, ctk.END)
+        self.listbox.insert(ctk.END, "Ingredients:")
+        trimmed_string = recipe[1:-1]
+        recipe_list = trimmed_string.split(",")
+        for item in recipe_list:
+            self.listbox.insert(ctk.END, item)
+
 
 
 

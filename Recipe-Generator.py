@@ -204,7 +204,7 @@ class recipeGUI:
         #Create Window
 
         window.title('Recipe Generator')
-        window.geometry('1700x1080+50')
+        window.geometry('1400x700')
         #Create a fullscreen window
         self.init_ui()
 
@@ -240,12 +240,6 @@ class recipeGUI:
         self.optionmenu = ctk.CTkOptionMenu(window, values=[food.title for food in pantry.recipes],command=self.optionmenu_callback)
         self.optionmenu.set("Saved Recipes")
         self.optionmenu.grid(row = 4, column = 1)
-
-
-        ######## Search field ##########
-        #self.search_entry = ctk.CTkEntry(window, width=400)
-        #self.search_entry.grid(row = 0, column = 0)
-
 
 
         ######## Combobox creation ########

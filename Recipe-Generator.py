@@ -190,7 +190,7 @@ pantry = Pantry()
 import customtkinter as ctk
 from customtkinter import filedialog
 from PIL import Image
-import tkinter
+import tkinter as tk
 from tkinter import messagebox
 import re
 from CTkListbox import *
@@ -259,6 +259,12 @@ class recipeGUI:
         self.label = ctk.CTkLabel(master=window, image=self.your_image, text='')
         self.label.grid(column=1, row=2, rowspan=2)
 
+        # create an instance of the ImageDisplayer class
+        #image_displayer = ImageDisplayer()
+
+        # create a button to open the new GUI
+        self.button = tk.Button(window, text="Open New GUI", command=lambda: ImageDisplayer().mainloop())
+        self.button.grid(column=1, row=6)
 
 
 
@@ -396,8 +402,6 @@ class recipeGUI:
             pass
 
 
-
-
     def search_recipe(self):
         #Gets the search parameter and searches for the recipe.
         search_term = self.menulist.get()
@@ -422,8 +426,152 @@ class recipeGUI:
         for item in recipe_list:
             self.listbox.insert(ctk.END, item)
 
+import PIL.Image as Image
+import PIL.ImageTk as ImageTk
 
 
+class ImageDisplayer:
+    def __init__(self):
+        self.root = tk.Toplevel()
+        self.master = self.root
+        self.master.title("Three Frames")
+        self.master.geometry("1210x900")
+        self.master.resizable(False, True)
+
+        # Create a frame
+        self.frame = tk.Frame(self.master)
+
+
+        # Create a canvas inside the frame
+        self.canvas = tk.Canvas(self.frame)
+
+
+        # Create a scrollbar inside the frame
+        self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
+
+        # Create a scrollable frame inside the canvas
+        self.scrollable_frame = tk.Frame(self.canvas)
+
+        # Configure the scrollable frame to update the canvas scroll region
+        self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        # Pack the frame, canvas, and scrollbar
+        self.frame.pack(fill="both", expand=True)
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+
+        # Bind the mouse wheel event to the on_mouse_wheel method
+        self.master.bind_all("<MouseWheel>", self.on_mouse_wheel)
+
+        # Create a list of images
+        self.images = []
+        self.recipe_buttons = []
+        self.recipes = []
+        self.load_saved_recipes()
+
+        # Call the button_clicked function
+        self.load_saved_recipes()
+        self.button_clicked()
+
+
+        # Initialize the variables to store the last known window width and height
+        self.last_width = 0
+        self.last_height = 0
+
+        # Bind the configure event to the check_window_size_and_call_button_clicked method
+        self.master.bind('<Configure>', self.check_window_size_and_call_button_clicked)
+
+        self.master.config(background="#333")
+        self.frame.config(background="#333")
+        self.canvas.config(background="#333")
+        self.scrollbar.config(background="#333")
+
+    def on_mouse_wheel(self, event):
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def button_clicked(self):
+        # Set the image size to a fixed size
+        image_width = 400
+        image_height = 400
+
+
+        row = 0
+        column = 0
+        for recipe in self.recipes:
+            image_name = recipe.image_name
+            Image_path = os.path.join("archive", "Food Images", image_name + ".jpg")
+            image = Image.open(Image_path)
+            image = image.resize((image_width, image_height), Image.BICUBIC)
+            image_tk = ImageTk.PhotoImage(image)
+
+            # Create a label and button for each image
+            label = tk.Label(self.scrollable_frame, image=image_tk)
+            label.grid(row=row, column=column, sticky="nsew")
+
+            recipe_button = tk.Button(self.scrollable_frame, text=recipe.title, height=2)
+            recipe_button.config(command=lambda recipe_button=recipe_button: self.button_clicked2(recipe_button))
+            recipe_button.grid(row=row+1, column=column, sticky="nsew")
+
+            column += 1
+            if column >= 3:
+                row += 2
+                column = 0
+            self.images.append(image_tk)
+            self.recipe_buttons.append(recipe_button)
+
+
+        # Update the scroll region to include all the images and buttons
+        self.canvas.config(scrollregion=self.canvas.bbox(tk.ALL))
+
+
+
+
+    def load_saved_recipes(self):
+        filepath = r"archive\Sample.json"  # path to the JSON file
+
+        # Open the file in read mode
+        with open(filepath, 'r') as f:
+            # Load the JSON data into a dictionary
+            recipe_dict = json.load(f)
+
+        # Clear the existing recipes list
+        self.recipes = []
+
+        # Iterate over the recipes in the dictionary
+        for title, recipe_info in recipe_dict.items():
+            # Create a new Recipe object from the dictionary values
+            recipe = Recipe(title, recipe_info['ingredients'], recipe_info['instructions'], recipe_info['image_name'])
+
+            # Add the new recipe to the list
+            self.recipes.append(recipe)
+
+    def check_window_size_and_call_button_clicked(self, event):
+        # Get the current window width and height
+        current_width = self.master.winfo_width()
+        current_height = self.master.winfo_height()
+
+        # Check if the window width or height has changed since the last time the function ran
+        if self.last_width != current_width or self.last_height != current_height:
+            # Update the variables to reflect the changes
+            self.last_width = current_width
+            self.last_height = current_height
+
+            # Call the button_clicked function
+            self.button_clicked()
+
+    def button_clicked2(self, recipe_button):
+        for recipe in self.recipes:
+            if recipe.title == recipe_button.cget("text"):
+                # Assuming 'window' is an instance of the other class
+                gui.update_text(recipe)
+                break
+
+    def mainloop(self):
+        self.master.mainloop()
 
 window = ctk.CTk()
 gui = recipeGUI(window)

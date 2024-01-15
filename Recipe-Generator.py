@@ -431,7 +431,41 @@ import PIL.ImageTk as ImageTk
 
 
 class ImageDisplayer:
+    """
+    This class creates a GUI window that displays images and buttons for recipes in a grid pattern
+    for easier browsing of recipes.The selected recipe will be displayed in the parent window recipeGui.
+
+
+    Key Methods:
+        - __init__: Initializes the ImageDisplayer class.
+        - on_mouse_wheel: Handles mouse wheel events.
+        - button_clicked: Populates the GUI with images and buttons for each recipe.
+        - load_saved_recipes: Loads saved recipes from a JSON file.
+        - check_window_size_and_call_button_clicked: Checks if the window size has changed and updates the GUI accordingly.
+        - button_clicked2: Displays the chosen recipe when a button is clicked.
+        - mainloop: Starts the GUI event loop.
+    """
     def __init__(self):
+        """
+            Initializes the ImageDisplayer class.
+
+            Description:
+                This method creates the Toplevel GUI window and sets up its components, including a frame, canvas, and scrollbar. It also binds events to the mouse wheel and configure events.
+
+            Key Actions:
+                - Creates the Toplevel Tkinter window with a title, geometry, and resizable properties.
+                - Creates a frame, canvas, and scrollbar inside the main window.
+                - Configures the canvas to have a scrollable frame inside.
+                - Binds the mouse wheel event to the on_mouse_wheel method.
+                - Binds the configure event to the check_window_size_and_call_button_clicked method (commented out).
+                - Initializes lists for images, recipe buttons, and recipes.
+                - Calls the load_saved_recipes method to poplulate self.recipes
+                - Calls the button_clicked method to populate the scrollable frame.
+
+            Notes:
+                - The gui is set to only allow changing the size vertically. Increasing size horizontally made the gui look awful.
+                - The method uses the Tkinter library. I may switch this all to customTkinter in the future to match the parent gui.
+        """
         self.root = tk.Toplevel()
         self.master = self.root
         self.master.title("Three Frames")
@@ -483,29 +517,47 @@ class ImageDisplayer:
         self.last_height = 0
 
         # Bind the configure event to the check_window_size_and_call_button_clicked method
-        self.master.bind('<Configure>', self.check_window_size_and_call_button_clicked)
+        #self.master.bind('<Configure>', self.check_window_size_and_call_button_clicked)
 
-        self.master.config(background="#333")
-        self.frame.config(background="#333")
-        self.canvas.config(background="#333")
-        self.scrollbar.config(background="#333")
+
 
     def on_mouse_wheel(self, event):
+        """Manages the Scrolling of the scrollable frame"""
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def button_clicked(self):
+        """
+        This function populates the scrollable frame with images and buttons for each recipe.
+        It uses a grid layout to arrange the images and buttons in a 3xN configuration.
+
+        The function iterates through the list of recipes and for each recipe:
+        - Opens the image file using Pillow
+        - Resizes the image to a fixed size (400x400)
+        - Converts the resized image to a PhotoImage for Tkinter
+        - Creates a label and button for each image and adds them to the frame
+        - Appends the image and button to their respective lists
+
+        The function also updates the scroll region of the canvas to include all the images and buttons.
+        """
         # Set the image size to a fixed size
         image_width = 400
         image_height = 400
 
-
+        # Initialize row and column variables to track the position of the images and buttons
         row = 0
         column = 0
+
+        # Iterate through the list of recipes
         for recipe in self.recipes:
+            # Get the image name and path
             image_name = recipe.image_name
             Image_path = os.path.join("archive", "Food Images", image_name + ".jpg")
+
+            # Open the image and resize it using Pillow
             image = Image.open(Image_path)
             image = image.resize((image_width, image_height), Image.BICUBIC)
+
+            # Convert the resized image to a PhotoImage for Tkinter
             image_tk = ImageTk.PhotoImage(image)
 
             # Create a label and button for each image
@@ -516,13 +568,17 @@ class ImageDisplayer:
             recipe_button.config(command=lambda recipe_button=recipe_button: self.button_clicked2(recipe_button))
             recipe_button.grid(row=row+1, column=column, sticky="nsew")
 
+            #When the column variable exceeds 3 (i.e., the maximum number of columns), the row variable is incremented by 2 to create a new row,
+            # and the column variable is reset to 0. This ensures that the images and buttons are properly aligned in the grid layout.
             column += 1
             if column >= 3:
                 row += 2
                 column = 0
+
+            # Append the image and button to their respective lists
+            #This is necessary to prevent tkinter garbage collecting the widgets
             self.images.append(image_tk)
             self.recipe_buttons.append(recipe_button)
-
 
         # Update the scroll region to include all the images and buttons
         self.canvas.config(scrollregion=self.canvas.bbox(tk.ALL))
@@ -531,6 +587,14 @@ class ImageDisplayer:
 
 
     def load_saved_recipes(self):
+        """
+        Loads saved recipes from a JSON file into the recipes list.
+
+        Opens the specified JSON file in read mode, loads the data into a dictionary,
+        and then iterates over the recipes in the dictionary. For each recipe, creates
+        a new Recipe object from the dictionary values and adds it to the recipes list.
+        """
+
         filepath = r"archive\Sample.json"  # path to the JSON file
 
         # Open the file in read mode
@@ -550,6 +614,14 @@ class ImageDisplayer:
             self.recipes.append(recipe)
 
     def check_window_size_and_call_button_clicked(self, event):
+        """
+        Checks if the window size has changed and calls the button_clicked function if necessary.
+
+        Gets the current window width and height, and compares them to the last known values.
+        If the width or height has changed, updates the last known values and calls the button_clicked function.
+
+        :param event: the event that triggered the function (not used in this implementation)
+        """
         # Get the current window width and height
         current_width = self.master.winfo_width()
         current_height = self.master.winfo_height()
@@ -564,6 +636,12 @@ class ImageDisplayer:
             self.button_clicked()
 
     def button_clicked2(self, recipe_button):
+        """
+        Gets the name of the button, And finds the matching recipe in self.recipes,
+        It then sends the recipe to the update_text function of the recipeGui to display the chosen recipe
+        Args:
+            recipe_button: The button object that was clicked
+        """
         for recipe in self.recipes:
             if recipe.title == recipe_button.cget("text"):
                 # Assuming 'window' is an instance of the other class
@@ -571,6 +649,7 @@ class ImageDisplayer:
                 break
 
     def mainloop(self):
+        """Starts the gui's main loop"""
         self.master.mainloop()
 
 window = ctk.CTk()

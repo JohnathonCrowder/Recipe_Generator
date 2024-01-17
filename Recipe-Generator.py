@@ -177,6 +177,16 @@ class Cookbook:
         else:  # if no match is found
             return None
 
+    def get_random_recipes(self, num_recipes):
+        """Get specified number of random recipes"""
+
+        recipes = []
+        for i in range(num_recipes):
+            recipe = self.get_random_recipe()
+            recipes.append(recipe)
+
+        return recipes
+
 
     #'Grilled Shrimp with Tamarind Sauce'
 
@@ -262,9 +272,13 @@ class recipeGUI:
         # create an instance of the ImageDisplayer class
         #image_displayer = ImageDisplayer()
 
-        # create a button to open the new GUI
-        self.button = tk.Button(window, text="Open New GUI", command=lambda: ImageDisplayer().mainloop())
-        self.button.grid(column=1, row=6)
+        #Create a button to open the random recipe viewer
+        self.saved_recipes_button = ctk.CTkButton(window, text="Saved Recipes",command=lambda: ImageDisplayer().mainloop())
+        self.saved_recipes_button.grid(column=1, row=6)
+
+        # create a button to open the saved recipe viewer
+        self.browse_recipe_button = ctk.CTkButton(window, text="Browse Recipes", command=lambda: ImageDisplayer(cookbook.get_random_recipes(500)).mainloop())
+        self.browse_recipe_button.grid(column=1, row=7)
 
 
 
@@ -445,7 +459,7 @@ class ImageDisplayer:
         - button_clicked2: Displays the chosen recipe when a button is clicked.
         - mainloop: Starts the GUI event loop.
     """
-    def __init__(self):
+    def __init__(self,recipes=None):
         """
             Initializes the ImageDisplayer class.
 
@@ -505,10 +519,13 @@ class ImageDisplayer:
         self.images = []
         self.recipe_buttons = []
         self.recipes = []
-        self.load_saved_recipes()
+
+        if recipes:
+            self.recipes = recipes
+        else:
+            self.load_saved_recipes()
 
         # Call the button_clicked function
-        self.load_saved_recipes()
         self.button_clicked()
 
 

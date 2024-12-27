@@ -1,4 +1,5 @@
 import pandas as pd
+
 pd.set_option('display.max_colwidth', None)
 
 import json
@@ -571,7 +572,12 @@ class ImageDisplayer:
             Image_path = os.path.join("archive", "Food Images", image_name + ".jpg")
 
             # Open the image and resize it using Pillow
-            image = Image.open(Image_path)
+            try:
+                image = Image.open(Image_path)
+            except OSError as e:
+                print(f"Error opening image: {e}")
+                print(f"Invalid file path: {Image_path}")
+                continue
             image = image.resize((image_width, image_height), Image.BICUBIC)
 
             # Convert the resized image to a PhotoImage for Tkinter
